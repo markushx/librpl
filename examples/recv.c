@@ -143,7 +143,7 @@ process(unsigned char *msg, int len,
 
 	if ( ! pkt_info )
 	{
-		fprintf(stderr, "received packet with no pkt_info from %s!", addr_str );
+		fprintf(stderr, "received packet with no pkt_info from %s!\n", addr_str );
 		return;
 	}
 
@@ -153,7 +153,7 @@ process(unsigned char *msg, int len,
 
 	if (len < sizeof(struct icmp6_hdr))
 	{
-		fprintf(stderr, "received icmpv6 packet with invalid length (%d) from %s",
+		fprintf(stderr, "received icmpv6 packet with invalid length (%d) from %s\n",
 			len, addr_str);
 		return;
 	}
@@ -166,20 +166,20 @@ process(unsigned char *msg, int len,
 		 *	We just want to listen to DAOs
 		 */
 
-		fprintf(stderr, "icmpv6 filter failed");
+	  fprintf(stderr, "icmpv6 filter failed 0x%x\n", icmph->icmp6_type);
 		return;
 	}
 
 	if (icmph->icmp6_type == ND_ROUTER_ADVERT)
 	{
 		if (len < sizeof(struct nd_router_advert)) {
-			fprintf(stderr, "received icmpv6 RA packet with invalid length (%d) from %s",
+			fprintf(stderr, "received icmpv6 RA packet with invalid length (%d) from %s\n",
 				len, addr_str);
 			return;
 		}
 
 		if (!IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr)) {
-			fprintf(stderr, "received icmpv6 RA packet with non-linklocal source address from %s", addr_str);
+			fprintf(stderr, "received icmpv6 RA packet with non-linklocal source address from %s\n", addr_str);
 			return;
 		}
 	}
@@ -187,7 +187,7 @@ process(unsigned char *msg, int len,
 	if (icmph->icmp6_type == ND_ROUTER_SOLICIT)
 	{
 		if (len < sizeof(struct nd_router_solicit)) {
-			fprintf(stderr, "received icmpv6 RS packet with invalid length (%d) from %s",
+			fprintf(stderr, "received icmpv6 RS packet with invalid length (%d) from %s\n",
 				len, addr_str);
 			return;
 		}
@@ -195,7 +195,7 @@ process(unsigned char *msg, int len,
 
 	if (icmph->icmp6_code != 0)
 	{
-		fprintf(stderr, "received icmpv6 RS/RA packet with invalid code (%d) from %s",
+		fprintf(stderr, "received icmpv6 RS/RA packet with invalid code (%d) from %s\n",
 			icmph->icmp6_code, addr_str);
 		return;
 	}
@@ -205,7 +205,7 @@ process(unsigned char *msg, int len,
 	if (hoplimit != 255)
 	{
 		print_addr(&addr->sin6_addr, addr_str);
-		fprintf(stderr, "received RS or RA with invalid hoplimit %d from %s",
+		fprintf(stderr, "received RS or RA with invalid hoplimit %d from %s\n",
 			hoplimit, addr_str);
 		return;
 	}
@@ -214,7 +214,7 @@ process(unsigned char *msg, int len,
 
 	if (icmph->icmp6_type == ICMP6_RPL)
 	{
-		fprintf(stdout, "received DAO from %s", addr_str);
+		fprintf(stdout, "received DAO from %s\n", addr_str);
 		process_dao(msg, len, addr);
 	}
 	else
