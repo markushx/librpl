@@ -1,18 +1,18 @@
 
-SOURCES:= rpl-root-node.c
+SOURCES:= rpl-root-node.c socket.c send.c recv.c util.c
 
 OBJECTS:= $(patsubst %.c, %.o, $(SOURCES))
 
 PROGRAMS:=rpl-root-node
 
-CFLAGS       = -g -I..
+CFLAGS       = -g -I.. -D_GNU_SOURCE
 LDFLAGS      = -L.. -L/usr/lib
 LDLIBS       = -lrpl -lrt
 
 #all:    $(PROGRAMS)
 
-rpl-root-node: rpl-root-node.o
-	$(CC) -o $@ $< $(LDFLAGS) $(LDLIBS)
+rpl-root-node: $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm $(OBJECTS) rpl-root-node
