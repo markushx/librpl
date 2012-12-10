@@ -13,10 +13,9 @@
  *
  */
 
-//#include "config.h"
-//#include "includes.h"
-//#include "radvd.h"
 #include "socket.h"
+
+#include "defines.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -99,8 +98,9 @@ open_icmpv6_socket(void)
 	 */
 
 	ICMP6_FILTER_SETBLOCKALL(&filter);
-	ICMP6_FILTER_SETPASS(ND_ROUTER_SOLICIT, &filter);
-	ICMP6_FILTER_SETPASS(ND_ROUTER_ADVERT, &filter);
+	//ICMP6_FILTER_SETPASS(ND_ROUTER_SOLICIT, &filter);
+	//ICMP6_FILTER_SETPASS(ND_ROUTER_ADVERT, &filter);
+	ICMP6_FILTER_SETPASS(ICMP6_RPL, &filter);
 
 	err = setsockopt(sock, IPPROTO_ICMPV6, ICMP6_FILTER, &filter,
 			 sizeof(filter));
