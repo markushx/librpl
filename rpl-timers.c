@@ -63,8 +63,8 @@ static uint16_t next_dis;
 /* dio_send_ok is true if the node is ready to send DIOs */
 static uint8_t dio_send_ok;
 
-//TODO: create the timers (set periodic one to be periodic)
-//TODO: timer event -> methods
+//TODO: set periodic timer to be periodic
+//TODO: check DIS/DAO disabled for root node
 
 static void
 timerHandler(int sig, siginfo_t *si, void *uc)
@@ -204,9 +204,10 @@ new_dio_interval(rpl_instance_t *instance)
   PRINTF("RPL: Scheduling DIO timer\n");
   //ctimer_set(&instance->dio_timer, ticks, &handle_dio_timer, instance);
 
-  ret = timer_settime(&instance->dio_timer, 0, &its, NULL);
+  ret = timer_settime(*(instance->dio_timer), 0, &its, NULL);
   if (ret != 0) {
     PRINTF("RPL: Scheduling DIO timer failed '%s'.\n", strerror(errno));
+    PRINTF("RPL: FAIL INFO: %i %i %i\n", &instance->dio_timer, its.it_value.tv_sec, its.it_value.tv_nsec);
   }
 
 }
@@ -233,7 +234,7 @@ handle_dio_timer(void *ptr)
       PRINTF("RPL: Postponing DIO transmission since link local address is not ok\n");
       //ctimer_set(&instance->dio_timer, CLOCK_SECOND, &handle_dio_timer, instance);
 
-      ret = timer_settime(&instance->dio_timer, 0, &its, NULL);
+      ret = timer_settime(*(instance->dio_timer), 0, &its, NULL);
       if (ret != 0) {
 	PRINTF("RPL: Scheduling DIO timer failed.\n");
       }
@@ -263,7 +264,7 @@ handle_dio_timer(void *ptr)
     its.it_interval.tv_sec = 0;
     its.it_interval.tv_nsec = 0;
 
-    ret = timer_settime(&instance->dio_timer, 0, &its, NULL);
+    ret = timer_settime(*(instance->dio_timer), 0, &its, NULL);
     if (ret != 0) {
       PRINTF("RPL: Scheduling DIO timer failed.\n");
     }
@@ -293,9 +294,9 @@ rpl_reset_periodic_timer(void)
     ((uint32_t)RPL_DIS_INTERVAL * (uint32_t)rand()) / RAND_MAX -
     RPL_DIS_START_DELAY;
   //ctimer_set(&periodic_timer, CLOCK_SECOND, handle_periodic_timer, NULL);
-  ret = timer_settime(&periodic_timer, 0, &its, NULL);
+  ret = timer_settime(periodic_timer, 0, &its, NULL);
   if (ret != 0) {
-    PRINTF("RPL: Scheduling DIO timer failed.\n");
+    PRINTF("RPL: Scheduling DIS timer failed.\n");
   }
 }
 /*---------------------------------------------------------------------------*/
@@ -334,7 +335,7 @@ handle_dao_timer(void *ptr)
   /* if(!dio_send_ok && uip_ds6_get_link_local(ADDR_PREFERRED) == NULL) { */
   /*   PRINTF("RPL: Postpone DAO transmission\n"); */
   /*   //ctimer_set(&instance->dao_timer, CLOCK_SECOND, handle_dao_timer, instance); */
-  /*   ret = timer_settime(&instance->dao_timer, 0, &its, NULL); */
+  /*   ret = timer_settime(*(instance->dao_timer), 0, &its, NULL); */
   /*   if (ret != 0) { */
   /*     PRINTF("RPL: Scheduling DIO timer failed.\n"); */
   /*   } */
@@ -354,7 +355,7 @@ handle_dao_timer(void *ptr)
   /* its.it_value.tv_nsec = 0; */
   /* its.it_interval.tv_sec = 0; */
   /* its.it_interval.tv_nsec = 0; */
-  /* ret = timer_settime(&instance->dao_timer, 0, &its, NULL); */
+  /* ret = timer_settime(*(instance->dao_timer), 0, &its, NULL); */
   /* if (ret != 0) { */
   /*   PRINTF("RPL: Stopping DIO timer failed.\n"); */
   /* } */
@@ -386,7 +387,7 @@ rpl_schedule_dao(rpl_instance_t *instance)
     its.it_interval.tv_sec = 0;
     its.it_interval.tv_nsec = 0;
 
-    ret = timer_settime(&instance->dao_timer, 0, &its, NULL);
+    ret = timer_settime(*(instance->dao_timer), 0, &its, NULL);
     if (ret != 0) {
       PRINTF("RPL: Stopping DIO timer failed.\n");
     }
